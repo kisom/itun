@@ -10,7 +10,7 @@ supplemented with an SSH tunnel for security.
 
 
 Overview
----------------------
+--------
 This guide will cover the following:
     * requirements
     * intro to iodine
@@ -19,4 +19,16 @@ This guide will cover the following:
 
 I have written some scripts to largely automate the process, and these
 will be presented as well.
+
+
+Requirements
+------------
+iodine requires a domain that you have control over, the latest source tarballs
+from http://code.kryo.se/iodine/ (both client and server should have the same
+version), a BSD or Linux client, and a server with a static IP (or dynamic DNS)
+that runs Linux or BSD. If you plan on using the scripts I wrote, you will need
+the perl module Term::ReadKey - it's a common module that you can either
+install with cpan (sudo cpan Term::ReadKey), or use one of these packages:
+	* OpenBSD: devel/p5-Term-ReadKey
+	* Debian: libterm-readkey-perl
 
