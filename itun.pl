@@ -45,6 +45,7 @@ my %opts        = ( );
 # $rport: ssh port on remote host
 # $rhost: remote host (typically private IP)
 # $ruser: ssh user on remote host
+my $setup_tunnel = 0;
 my $lport = 8080;
 my $rport = 22;
 my $rhost = "";
