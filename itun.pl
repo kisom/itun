@@ -250,6 +250,7 @@ $retcode = system("sudo $route $rhost");
 print "[+] attempting to change default gateway...\t";
 if ($retcode) {
     print "FAILED!\n";
+    print "on $platform - failed with $route $rhost\n";
     die "!!! failed to set default route!\n\t$@";
 }
 print "OK\n";
