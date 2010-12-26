@@ -32,3 +32,23 @@ install with cpan (sudo cpan Term::ReadKey), or use one of these packages:
 	* OpenBSD: devel/p5-Term-ReadKey
 	* Debian: libterm-readkey-perl
 
+
+Setting Up the Domain
+----------------------
+The host running the iodine server needs an A record. For the purposes of this
+writeup, well use the following DNS names (as per the iodine README):
+	t1ns.mydomain.com	- the host running iodine
+	t1.mydomain.com		- the subdomain to listen for requests
+We'll cover t1 in a second, but for now, t1ns is the host. Set an A record 
+or dynamic DNS entry for the host.
+
+Now, you need to create an NS (nameserver) record. The iodine README has 
+specific instructions for bind; this NS record needs to point to t1ns. You
+should end up with something like:
+	NS	t1.mydomain.com		t1ns.mydomain.com
+	 A	t1ns.mydomain.com	1.2.3.4
+
+You can use the online utility at http://code.kryo.se/iodine/check-it to verify
+your DNS is set up properly.
+
+ 
