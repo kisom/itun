@@ -1,0 +1,11 @@
+IODINE TUNNEL SETUP
+Kyle Isom <coder@kyleisom.net>
+===============================
+
+
+Set of perl scripts to set up an iodine server and client tunnel.
+    * itun.pl: sets up tunnel on client
+    * iserv.pl: sets up iodine server
+    * iodine_writeup.txt: writeup on how to set up an iodine tunnel
+
+
