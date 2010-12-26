@@ -27,9 +27,8 @@ use Term::ReadKey;          # used for password entry
 # $update_path: flag indicated iodine path needs to be updated
 # $retcode: holds value of system calls
 # %opts: options hash
-#
 chomp(my $home  = `echo \$HOME`);
-chomp(my $bin   = `/usr/bin/env iodine`);
+chomp(my $bin   = `which iodine`);
 my $config_dir  = "$home/.iodine" ;
 my $config 	= "$home/.iodine/config";
 my $server 	= "";
@@ -51,8 +50,15 @@ my $rport = 22;
 my $rhost = "";
 chomp(my $ruser = `echo \$USER`);
 
-getopt("rkps", \%opts) ;
 
+
+###################
+# BEGIN MAIN CODE #
+###################
+# and so it begins...
+
+# process command line options
+getopt("rkps", \%opts) ;
 while ( my ($key, $value) = each(%opts) ) {
     if ($key eq 'r') {
         $reconfigure = 1;
@@ -97,6 +103,7 @@ if (! -s $config) {
     close CONFIG;
 }    
 
+# if the reconfigure flag is set, reconfigure the tunnel
 if ($reconfigure) {
     open(CONFIG, ">$config") or die "could not open $config: $@";
     print CONFIG "# iodine tunnel configuration file\n";
@@ -162,9 +169,8 @@ if ($update_path) {
     open(CONFIG, ">$config") or die "coud not open $config: $@";
     print CONFIG "$config_file\n";
     close CONFIG;
-
-
 }
+
 
 # READ SETTINGS
 # Open the config file and read the settings.
@@ -180,7 +186,7 @@ if (! $reconfigure) {
         chomp($value);                           # value has newline
 
         # load server and password variables
-        if ($option =~ /^server$/)      { $server   = $value; }
+        if    ($option =~ /^server$/)   { $server   = $value; }
         elsif ($option =~ /^password$/) { $password = $value; }
         elsif ($option =~ /^path$/)     { $bin      = $value; }
         elsif ($option =~ /^lport$/)    { $lport    = $value; }
@@ -195,6 +201,7 @@ if (! $reconfigure) {
     }
 }
 
+# iodine client
 # if a valid path to the iodine binary isn't found, abort
 if (! $bin) {
     print STDERR "!!! could not find iodine binary! check to make sure:\n";
@@ -205,6 +212,7 @@ if (! $bin) {
     exit 1;
 }
 
+# call the iodine client with the appropriate settings
 $retcode = system("sudo $bin -P $password $server");
 print "[+] attempting to run iodine client...\t\t";
 if ($retcode) {
@@ -213,7 +221,8 @@ if ($retcode) {
 }
 print "OK\n";
 
-# figure out the right routing command to use
+# routing table changes
+# prep for routing - figure out the right routing command to use
 chomp(my $platform = `uname -s`);
 $platform = lc $platform;
 
@@ -235,6 +244,7 @@ if ($retcode) {
 }
 print "OK\n";
 
+# cleanup
 # drop sudo privileges
 print "[+] dropping sudo privileges...\t\t\t";
 $retcode = system("sudo -K");
@@ -245,6 +255,7 @@ if ($retcode) {
 }
 print "OK\n";
 
+# at this point, an unencrypted tunnel is running
 print "[+] finished setting up iodine tunnel...\n";
 
 # if specified, set up an SSH tunnel to the server
@@ -260,10 +271,12 @@ if ($setup_tunnel) {
 }
 
 else {
-    print "*** to kill the SSH tunnel, run $0 with the -k flag.\n";
+    print "*** to kill the DNS tunnel, run $0 with the -k flag.\n";
 }
 
 exit 0;
+
+
 
 ####################
 # SUB: kill_iodine #
