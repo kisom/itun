@@ -8,6 +8,7 @@
 #   -r          reconfigure tunnel
 #   -k          kill tunnel
 #   -p          update path to binary
+#   -s          set up SSH tunnel
 
 use warnings;
 use strict;
@@ -39,6 +40,7 @@ my $retcode     = 0;
 my %opts        = ( );
 
 # SSH tunnel variables
+# $setup_tunnel: flag to set up the SSH tunnel
 # $lport: local port for SOCKS proxy
 # $rport: ssh port on remote host
 # $rhost: remote host (typically private IP)
@@ -48,7 +50,7 @@ my $rport = 22;
 my $rhost = "";
 chomp(my $ruser = `echo \$USER`);
 
-getopt("rkp", \%opts) ;
+getopt("rkps", \%opts) ;
 
 while ( my ($key, $value) = each(%opts) ) {
     if ($key eq 'r') {
@@ -57,6 +59,10 @@ while ( my ($key, $value) = each(%opts) ) {
 
     elsif ($key eq 'p') {
         $update_path = 1;
+    }
+
+    elsif ($key eq 's') {
+        $setup_tunnel = 1;
     }
 
     elsif ($key eq 'k') {
@@ -91,8 +97,9 @@ if (! -s $config) {
     }
     # regardless of whether the config dir needed creation, we need to
     # create the config file now. Set reconfigure flag to update config
-    # file.
+    # file and set update_path flag to update the path.
     $reconfigure = 1;
+    $update_path = 1;
     open(CONFIG, ">$config") or die "could not open $config: $@";
     print CONFIG "# iodine tunnel configuration file\n";
     close CONFIG;
@@ -111,6 +118,7 @@ if ($reconfigure) {
     chomp ($password = ReadLine(0));
     ReadMode('restore');
     print CONFIG "password: $password\n";
+    print "\n";                                 # newline for prettiness
 
     # set SSH options
     print "local port for SOCKS proxy (enter 0 to use default of $lport): ";
@@ -199,7 +207,7 @@ if (! $reconfigure) {
 if (! $bin) {
     print STDERR "!!! could not find iodine binary! check to make sure:\n";
     print STDERR "\t1. iodine has been installed\n";
-    print STDERR "\t2. iodine is in your path (i.e. export PATH=$PATH:";
+    print STDERR "\t2. iodine is in your path (i.e. export PATH=\$PATH:";
     print STDERR "/home/\$USER/bin\n";
     die "\n!!! binary not found!";
     exit 1;
@@ -213,15 +221,10 @@ if ($retcode) {
 }
 print "OK\n";
 
-$retcode = system("ssh -C2qTnNfn -D $lport -p $rport -l $ruser $rhost");
-print "[+] attempting to set up SSH tunnel...\t\t";
-if ($retcode) {
-    print "FAILED!\n";
-    die "!!! failed setting up SSH tunnel\n\t$@\n";
-}
-print "OK\n";
+# figure out the right routing command to use
+chomp(my $platform = `uname -s`);
+$platform = lc $platform;
 
-chomp(lc my $platform = `uname -s`);
 my $route = "";
 if ($platform =~ /linux/)   { $route = "route add default gw"; }
 elsif ($platform =~ /bsd/)  { $route = "route add default"; }
@@ -231,13 +234,60 @@ else {
     chomp($route = <STDIN>);
 }
 
+# change default route
 $retcode = system("sudo $route $rhost");
-print "[+] attempting to change default gateway...\t\t";
+print "[+] attempting to change default gateway...\t";
 if ($retcode) {
     print "FAILED!\n";
     die "!!! failed to set default route!\n\t$@";
 }
 print "OK\n";
 
-print "[+] finished\n";
+# drop sudo privileges
+print "[+] dropping sudo privileges...\t\t\t";
+$retcode = system("sudo -K");
+if ($retcode) {
+    print "FAILED!";
+    die "!!! could not revoke SSH permissions (maybe because there were ".
+        "no sudo privileges?) $@";
+}
+print "OK\n";
+
+print "[+] finished setting up iodine tunnel...\n";
+
+# if specified, set up an SSH tunnel to the server
+if ($setup_tunnel) {
+    print "*** to exit out of the SSH tunnel, hit control + C\n";
+    $retcode = system("ssh -C2qTnN -D $lport -p $rport -l $ruser $rhost");
+    print "[+] attempting to set up SSH tunnel...\t\t";
+    if ($retcode) {
+        print "FAILED!\n";
+        die "!!! failed setting up SSH tunnel\n\t$@\n";
+    }
+    print "OK\n";
+}
+
+else {
+    print "*** to kill the SSH tunnel, run $0 with the -k flag.\n";
+}
+
+exit 0;
+
+####################
+# SUB: kill_iodine #
+####################
+# parameters: none
+# does exactly what the name implies - kills the iodine tunnel.
+sub kill_iodine( ) {
+    $retcode = system('sudo pkill iodine');
+    if ($retcode) {
+        print STDERR "could not kill iodine client!\n";
+    }
+    else {
+        print "*** iodine client killed. Please reset your connection";
+        print " to reset default route.\n";
+    }
+    print "[+] exiting...\n";
+    exit $retcode;
+}
 
