@@ -1,0 +1,22 @@
+Setting Up An Iodine Tunnel in OpenBSD
+kisom <kisom@devio.us>
+
+What is iodine?
+---------------
+Iodine is a DNS tunneling application; it is useful for situations where
+DNS requests are allowed but certain regular TCP sessions are not. It is
+important to note that the tunnel is unencrypted; therefore, it should be
+supplemented with an SSH tunnel for security.
+
+
+Overview
+---------------------
+This guide will cover the following:
+    * requirements
+    * intro to iodine
+    * server setup
+    * client setup
+
+I have written some scripts to largely automate the process, and these
+will be presented as well.
+
