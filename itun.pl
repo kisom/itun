@@ -1,4 +1,9 @@
 #!/usr/bin/env perl
+# iodine tunnel setup
+# written by Kyle Isom <coder@kyleisom.net>
+#
+# see iodine_writeup.txt for instructions.
+# 
 
 use warnings;
 use strict;
@@ -16,6 +21,7 @@ use Term::ReadKey;          # used for password entry
 # %opts: options hash
 #
 chomp(my $home  = `echo \$HOME`);
+chomp(my $bin   = `/usr/bin/env iodine`)
 my $config_dir  = "$home/.iodine" ;
 my $config 	= "$home/.iodine/config";
 my $server 	= "";
@@ -101,4 +107,3 @@ if (! $reconfigure) {
     }
 }
 
-print "will connect to $server with $password...\n";
