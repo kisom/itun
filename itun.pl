@@ -65,6 +65,10 @@ chomp(my $ruser = `echo \$USER`);
 # process command line options
 getopt("rkpst", \%opts) ;
 while ( my ($key, $value) = each(%opts) ) {
+    if ($key eq 'h') {
+        &usage();
+    }
+
     if ($key eq 'r') {
         $reconfigure = 1;
     }
@@ -273,6 +277,7 @@ print "[+] finished setting up iodine tunnel...\n";
 # if specified, set up an SSH tunnel to the server
 if ($setup_tunnel) {
     print "[+] attempting to set up SSH tunnel...\n";
+    print "\tusing $ruser@$rhost...\n";
     print "*** to exit out of the SSH tunnel, hit control + C\n";
     $retcode = system("ssh -C2qTnN -D $lport -p $rport -l $ruser $rhost");
 
@@ -318,8 +323,8 @@ sub kill_iodine( ) {
 # parameters: none
 # prints a usage message and die()s.
 sub usage( ) {
-    print "itun.pl\n";
-    print "interface to iodine client\n";
+    print "\n\ninterface to iodine client\n";
+    print "written by Kyle Isom <coder@kyleisom.net>\n";
     print "based on iodine software at http://code.kryo.se/iodine\n\n";
     print "usage: $0 -hkprst\n";
     print "\noptions:\n";
