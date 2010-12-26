@@ -311,3 +311,27 @@ sub kill_iodine( ) {
     exit $retcode;
 }
 
+
+##############
+# SUB: usage #
+##############
+# parameters: none
+# prints a usage message and die()s.
+sub usage( ) {
+    print "itun.pl\n";
+    print "interface to iodine client\n";
+    print "based on iodine software at http://code.kryo.se/iodine\n\n";
+    print "usage: $0 -hkprst\n";
+    print "\noptions:\n";
+    print "\t-h          print this usage message\n";
+    print "\t-k          kill tunnel\n";
+    print "\t-p          update path to binary\n";
+    print "\t-r          reconfigure tunnel\n";
+    print "\t-s          set up SSH tunnel\n";
+    print "\t-t          hold iodine tunnel open after collapsing SSH ";
+    print "tunnel\n";
+    print "\t            (implies -s)\n";
+
+    exit 0;
+}    
+    
