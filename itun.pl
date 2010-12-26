@@ -23,17 +23,19 @@ use Term::ReadKey;          # used for password entry
 # $server: the server running iodine
 # $password: the password to the iodine server
 # $reconfigure: flag indicating config file should be rebuilt
+# $update_path: flag indicated iodine path needs to be updated
 # $retcode: holds value of system calls
 # %opts: options hash
 #
 chomp(my $home  = `echo \$HOME`);
-chomp(my $bin   = `/usr/bin/env iodine`)
+chomp(my $bin   = `/usr/bin/env iodine`);
 my $config_dir  = "$home/.iodine" ;
 my $config 	= "$home/.iodine/config";
 my $server 	= "";
 my $password 	= "";
 my $reconfigure = 0;
 my $update_path = 0;
+my $retcode     = 0;
 my %opts        = ( );
 
 # SSH tunnel variables
@@ -178,13 +180,13 @@ if (! $reconfigure) {
         chomp($value);                           # value has newline
 
         # load server and password variables
-        if ($option =~ /^server$/) { $server = $value; }
+        if ($option =~ /^server$/)      { $server   = $value; }
         elsif ($option =~ /^password$/) { $password = $value; }
-        elsif ($option =~ /^path$/)     { $bin = $value; }
-        elsif ($option =~ /^lport$/     { $lport = $value; }
-        elsif ($option =~ /^rport$/     { $rport = $value; }
-        elsif ($option =~ /^rhost$/     { $rhost = $value; }
-        elsif ($option =~ /^ruser$/     { $ruser = $value; }
+        elsif ($option =~ /^path$/)     { $bin      = $value; }
+        elsif ($option =~ /^lport$/)    { $lport    = $value; }
+        elsif ($option =~ /^rport$/)    { $rport    = $value; }
+        elsif ($option =~ /^rhost$/)    { $rhost    = $value; }
+        elsif ($option =~ /^ruser$/)    { $ruser    = $value; }
         else {
             print STDERR "!!! invalid option in config file!\n";
             print STDERR "    offending option: $option\n";
