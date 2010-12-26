@@ -237,12 +237,13 @@ chomp(my $platform = `uname -s`);
 $platform = lc $platform;
 
 my $route = "";
-if ($platform =~ /linux/)   { $route = "route add default gw"; }
-elsif ($platform =~ /bsd/)  { $route = "route add default"; }
+if ($platform =~ /linux/)   { $route = "route add default gw $rhost"; }
+elsif ($platform =~ /bsd/)  { $route = "route add default $rhost"; }
 else {
-    print "please specify default route command ";
-    print "(without gateway address): ";
+    print "please specify default route command\n";
+    print "(use GATEWAY as placeholder for gateway) command: ";
     chomp($route = <STDIN>);
+    $route =~ s/GATEWAY/$rhost/ ;
 }
 
 # change default route
@@ -250,7 +251,7 @@ $retcode = system("sudo $route $rhost");
 print "[+] attempting to change default gateway...\t";
 if ($retcode) {
     print "FAILED!\n";
-    print "on $platform - failed with $route $rhost\n";
+    print "*** on $platform - failed with $route $rhost\n";
     die "!!! failed to set default route!\n\t$@";
 }
 print "OK\n";
