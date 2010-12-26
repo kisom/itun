@@ -66,16 +66,7 @@ while ( my ($key, $value) = each(%opts) ) {
     }
 
     elsif ($key eq 'k') {
-        $retcode = system('sudo pkill iodine');
-        if ($retcode) {
-            print STDERR "could not kill iodine client!\n";
-        }
-        else {
-            print "*** iodine client killed. Please reset your connection";
-            print " to reset default route.\n";
-            print "*** please remember to kill the SSH tunnel.\n";
-        }
-        exit $retcode;
+        &kill_iodine( );
     }
 }    
 
