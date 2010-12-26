@@ -8,6 +8,9 @@ DNS requests are allowed but certain regular TCP sessions are not. It is
 important to note that the tunnel is unencrypted; therefore, it should be
 supplemented with an SSH tunnel for security.
 
+This guide assumes the reader understands the concept of tunneling, and is
+competent in systems administration.
+
 
 Overview
 --------
@@ -49,6 +52,18 @@ should end up with something like:
 	 A	t1ns.mydomain.com	1.2.3.4
 
 You can use the online utility at http://code.kryo.se/iodine/check-it to verify
-your DNS is set up properly.
+your DNS is set up properly. 
 
- 
+
+Setting Up the Server
+---------------------
+To install iodine, you should grab the latest source tarball. Because the 
+specifics of the protocol used by iodine change with different versions, you
+should use the same version of the source on both the server and client.
+
+Unpack the source tarball somewhere convenient, and run make && make install.
+If you want to change the prefix, edit the Makefile (the prefix definition
+should be on the first line).
+
+On Debian, you can run dpkg-reconfigure iodine to use the (curses) GUI to
+configure iodine. 
