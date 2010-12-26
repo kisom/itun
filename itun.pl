@@ -9,6 +9,8 @@
 #   -k          kill tunnel
 #   -p          update path to binary
 #   -s          set up SSH tunnel
+#   -t          hold iodine tunnel open after collapsing SSH tunnel
+#               (implies -s)
 
 use warnings;
 use strict;
@@ -25,6 +27,8 @@ use Term::ReadKey;          # used for password entry
 # $password: the password to the iodine server
 # $reconfigure: flag indicating config file should be rebuilt
 # $update_path: flag indicated iodine path needs to be updated
+# $hold_open: flag indicating iodine should be kept open even when SSH 
+#             tunnel is closed down.
 # $retcode: holds value of system calls
 # %opts: options hash
 chomp(my $home  = `echo \$HOME`);
@@ -35,6 +39,7 @@ my $server 	= "";
 my $password 	= "";
 my $reconfigure = 0;
 my $update_path = 0;
+my $hold_open   = 0;
 my $retcode     = 0;
 my %opts        = ( );
 
@@ -58,7 +63,7 @@ chomp(my $ruser = `echo \$USER`);
 # and so it begins...
 
 # process command line options
-getopt("rkps", \%opts) ;
+getopt("rkpst", \%opts) ;
 while ( my ($key, $value) = each(%opts) ) {
     if ($key eq 'r') {
         $reconfigure = 1;
@@ -70,6 +75,11 @@ while ( my ($key, $value) = each(%opts) ) {
 
     elsif ($key eq 's') {
         $setup_tunnel = 1;
+    }
+
+    elsif ($key eq 't') {
+        $setup_tunnel = 1;
+        $hold_open = 1;
     }
 
     elsif ($key eq 'k') {
@@ -260,14 +270,17 @@ print "[+] finished setting up iodine tunnel...\n";
 
 # if specified, set up an SSH tunnel to the server
 if ($setup_tunnel) {
+    print "[+] attempting to set up SSH tunnel...\n";
     print "*** to exit out of the SSH tunnel, hit control + C\n";
     $retcode = system("ssh -C2qTnN -D $lport -p $rport -l $ruser $rhost");
-    print "[+] attempting to set up SSH tunnel...\t\t";
-    if ($retcode) {
-        print "FAILED!\n";
-        die "!!! failed setting up SSH tunnel\n\t$@\n";
+
+    print "[+] SSH tunnel closed...\n";
+    if (! $hold_open) {
+        &kill_iodine( );
     }
-    print "OK\n";
+    else {
+        print "*** to kill the DNS tunnel, run $0 with the -k flag.\n";
+    }
 }
 
 else {
