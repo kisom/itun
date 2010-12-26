@@ -241,8 +241,11 @@ chomp(my $platform = `uname -s`);
 $platform = lc $platform;
 
 my $route = "";
-if ($platform =~ /linux/)   { $route = "route add default gw $rhost"; }
-elsif ($platform =~ /bsd/)  { $route = "route add default $rhost"; }
+if ($platform =~ /linux/)   { 
+                              $route  = "route add default gw $rhost"; 
+                              $route .= " dev dns0";
+                            }
+elsif ($platform =~ /bsd/)  { $route  = "route add default $rhost"; }
 else {
     print "please specify default route command\n";
     print "(use GATEWAY as placeholder for gateway) command: ";
