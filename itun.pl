@@ -284,7 +284,7 @@ print "[+] finished setting up iodine tunnel...\n";
 # if specified, set up an SSH tunnel to the server
 if ($setup_tunnel) {
     print "[+] attempting to set up SSH tunnel...\n";
-    print "\tusing $ruser@$rhost...\n";
+    print "\tusing $ruser\@$rhost...\n";
     print "*** to exit out of the SSH tunnel, hit control + C\n";
     $retcode = system("ssh -C2qTnN -D $lport -p $rport -l $ruser $rhost");
 
