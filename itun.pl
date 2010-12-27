@@ -327,7 +327,7 @@ sub kill_iodine( ) {
 # prints a usage message and die()s.
 sub usage( ) {
     print "\n\ninterface to iodine client\n";
-    print "written by Kyle Isom <coder@kyleisom.net>\n";
+    print "written by Kyle Isom <coder\@kyleisom.net>\n";
     print "based on iodine software at http://code.kryo.se/iodine\n\n";
     print "usage: $0 -hkprst\n";
     print "\noptions:\n";
